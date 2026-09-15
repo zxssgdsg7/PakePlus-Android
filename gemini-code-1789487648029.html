@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>小学五年级英语听力100关 - 手机竖屏全屏版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0d1117;
+            color: #fff;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+            animation: float 8s infinite alternate ease-in-out;
+        }
+        .bg-1 { width: 80vw; height: 80vw; background: rgba(255, 0, 127, 0.15); top: -10%; left: -10%; }
+        .bg-2 { width: 80vw; height: 80vw; background: rgba(0, 242, 254, 0.12); bottom: -10%; right: -10%; }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        /* 手机竖屏全屏容器适配 */
+        .game-card {
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+            height: 100vh;
+            /* 适配 iPhone / 安卓全屏刘海与底部条 */
+            padding-top: max(16px, env(safe-area-inset-top));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+            padding-left: 16px;
+            padding-right: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* 顶部状态栏 */
+        .header-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 16px;
+            border-radius: 20px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .hp-bar { display: flex; gap: 4px; font-size: 1.6rem; }
+        .score-box { font-weight: 800; color: #00f2fe; font-size: 1.4rem; }
+        .level-badge { 
+            background: linear-gradient(45deg, #ff007f, #7928ca); 
+            padding: 8px 18px; 
+            border-radius: 20px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .level-badge:active { transform: scale(0.95); }
+
+        .screen { 
+            display: none; 
+            height: 100%; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            width: 100%; 
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .screen.active { display: flex; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 主标题与描述 */
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            background: linear-gradient(45deg, #ff007f, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.desc { font-size: 1.2rem; color: #a0a5c0; margin-bottom: 24px; line-height: 1.5; }
+
+        /* 手机端贴顶好词好句展示卡片 */
+        .quote-card {
+            width: 100%;
+            background: rgba(0, 242, 254, 0.12);
+            border: 1.5px dashed rgba(0, 242, 254, 0.6);
+            border-radius: 16px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .quote-en {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #00f2fe;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .quote-zh {
+            font-size: 1.1rem;
+            color: #ffbd2e;
+            font-weight: 600;
+        }
+
+        .audio-player-zone {
+            margin: 6px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* 播放与提示按钮（适合手机点击） */
+        .play-btn {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+            transition: all 0.2s;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .play-btn:active { transform: scale(0.92); }
+        .play-btn svg { width: 44px; height: 44px; fill: #1a1c29; margin-left: 4px; }
+
+        .play-btn.playing::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid #00f2fe;
+            animation: ripple 1.2s infinite ease-out;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .hint-btn {
+            background: rgba(255, 189, 46, 0.15);
+            border: 1.5px solid #ffbd2e;
+            color: #ffbd2e;
+            padding: 12px 20px;
+            border-radius: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hint-btn:active { transform: scale(0.95); }
+
+        .hint-box {
+            display: none;
+            background: rgba(255, 189, 46, 0.15);
+            border: 1.5px dashed #ffbd2e;
+            color: #ffbd2e;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            word-break: break-all;
+            text-align: left;
+            width: 100%;
+        }
+
+        /* 手机端导航按钮 */
+        .level-nav-container {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .nav-level-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .nav-level-btn:active:not(:disabled) {
+            background: rgba(0, 242, 254, 0.25);
+            border-color: #00f2fe;
+            color: #00f2fe;
+        }
+
+        .nav-level-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 语速调节面板 */
+        .speed-control-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 14px;
+            border-radius: 16px;
+        }
+
+        .speed-label { font-size: 1rem; color: #a0a5c0; margin-bottom: 6px; display: block; text-align: left; }
+        .speed-options { display: flex; gap: 8px; }
+
+        .speed-btn {
+            flex: 1;
+            padding: 8px 0;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .speed-btn.active {
+            background: #00f2fe;
+            color: #000;
+            font-weight: bold;
+            border-color: #00f2fe;
+        }
+
+        /* 手机端单列选项布局 */
+        .options-grid { 
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+            margin-top: 6px; 
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1.3;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-card:active { background: rgba(255, 255, 255, 0.18); border-color: #00f2fe; }
+        .option-card.correct { background: rgba(46, 213, 115, 0.28) !important; border-color: #2ed573 !important; color: #2ed573; }
+        .option-card.wrong { background: rgba(255, 71, 87, 0.28) !important; border-color: #ff4757 !important; color: #ff4757; }
+
+        .cloze-text-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid rgba(0, 242, 254, 0.4);
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+            text-align: left;
+            margin-top: 6px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .cloze-blank {
+            color: #00f2fe;
+            font-weight: bold;
+            text-decoration: underline;
+            padding: 0 6px;
+        }
+
+        /* 手机主按钮 */
+        .btn-main {
+            width: 100%;
+            margin: 10px auto 0 auto;
+            padding: 16px;
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(45deg, #ff007f, #7928ca);
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: block;
+        }
+        .btn-main:active { transform: scale(0.97); }
+
+        .type-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 1rem;
+            border-radius: 10px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        .type-choice { background: rgba(0, 242, 254, 0.2); color: #00f2fe; border: 1px solid #00f2fe; }
+        .type-cloze { background: rgba(235, 77, 75, 0.2); color: #ff7979; border: 1px solid #ff7979; }
+
+        .feedback-msg { min-height: 28px; font-size: 1.2rem; font-weight: bold; margin-top: 6px; flex-shrink: 0; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-out; }
+
+        .modal-content {
+            background: #161b22;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            height: 90vh;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 12px;
+        }
+
+        .modal-header h3 { font-size: 1.5rem; color: #00f2fe; }
+        .close-btn { background: none; border: none; color: #a0a5c0; font-size: 2.2rem; cursor: pointer; }
+
+        /* 地图网格：手机端适配为 4 列 */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .level-node {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #a0a5c0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-node:active { transform: scale(0.92); }
+
+        .level-node.completed {
+            background: rgba(46, 213, 115, 0.2);
+            border-color: #2ed573;
+            color: #2ed573;
+        }
+
+        .level-node.current {
+            background: rgba(0, 242, 254, 0.25);
+            border-color: #00f2fe;
+            color: #00f2fe;
+            box-shadow: 0 0 12px rgba(0,242,254,0.4);
+        }
+
+        .node-tag { font-size: 0.9rem; opacity: 0.8; margin-top: 2px; }
+
+        #canvas { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-element bg-1"></div>
+    <div class="bg-element bg-2"></div>
+    <canvas id="canvas"></canvas>
+
+    <div class="modal-overlay" id="mapModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🗺️ 关卡地图</h3>
+                <button class="close-btn" onclick="closeMap()">✕</button>
+            </div>
+            <div class="level-grid" id="levelGrid"></div>
+        </div>
+    </div>
+
+    <div class="game-card">
+        <div class="header-status" id="headerStatus" style="display: none;">
+            <div class="hp-bar" id="hpBar">❤️❤️❤️</div>
+            <div class="level-badge" id="levelBadge" onclick="openMap()">关卡 1/100 🗺️</div>
+            <div class="score-box">得分: <span id="scoreText">0</span></div>
+        </div>
+
+        <div id="startScreen" class="screen active">
+            <div style="margin: auto 0; padding: 12px 0;">
+                <h1>五年级英语听力<br>大冒险 🎧</h1>
+                <p class="desc"><b>100 关小学五年级基础特训！</b><br>全量适配 PEP 小学五年级教材，包含基础日常对话与简单短文填空。</p>
+                <button class="btn-main" onclick="startGame()">开始/继续挑战 🚀</button>
+                <button class="btn-main" style="background: rgba(0,242,254,0.18); border: 1.5px solid #00f2fe;" onclick="openMap()">🗺️ 自由选关地图</button>
+                <button class="btn-main" style="background: rgba(255,255,255,0.1);" onclick="resetProgress()">重置进度 🔄</button>
+            </div>
+        </div>
+
+        <div id="quizScreen" class="screen">
+            <!-- 1. 最顶部：英文好词好句（紧贴顶部） -->
+            <div class="quote-card">
+                <div class="quote-en" id="quoteEn">"Believe in yourself."</div>
+                <div class="quote-zh" id="quoteZh">💡 相信你自己。</div>
+            </div>
+
+            <!-- 2. 题型与提示 -->
+            <div style="text-align: left; flex-shrink: 0;">
+                <span class="type-badge" id="typeBadge">五年级单选</span>
+            </div>
+            <p id="questionPrompt" style="font-size: 1.35rem; color: #fff; text-align: left; font-weight: 600; line-height: 1.3; flex-shrink: 0; margin-bottom: 4px;"></p>
+            
+            <!-- 3. 听力控制与导航 -->
+            <div class="audio-player-zone">
+                <div class="player-row">
+                    <button class="play-btn" id="playBtn" onclick="playAudio()">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="hint-btn" onclick="toggleHint()">💡 原文/提示</button>
+                </div>
+
+                <div class="hint-box" id="hintBox"></div>
+
+                <div class="level-nav-container">
+                    <button class="nav-level-btn" id="prevLevelBtn" onclick="prevLevel()">⬅️ 上一关</button>
+                    <button class="nav-level-btn" id="nextLevelBtn" onclick="nextLevel()">下一关 ➡️</button>
+                </div>
+
+                <div class="speed-control-container">
+                    <span class="speed-label">🎚️ 语速调节 (标准: <span id="currentSpeedText">0.75x</span>)</span>
+                    <div class="speed-options">
+                        <button class="speed-btn" onclick="setSpeed(0.6, this)">0.6x</button>
+                        <button class="speed-btn active" onclick="setSpeed(0.75, this)">0.75x</button>
+                        <button class="speed-btn" onclick="setSpeed(0.9, this)">0.9x</button>
+                        <button class="speed-btn" onclick="setSpeed(1.0, this)">1.0x</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 完形填空文本显示区 -->
+            <div class="cloze-text-card" id="clozeZone" style="display: none;">
+                <span id="clozeDisplay"></span>
+            </div>
+
+            <!-- 5. 选项区域 -->
+            <div class="options-grid" id="optionsGrid"></div>
+
+            <div class="feedback-msg" id="feedbackMsg"></div>
+        </div>
+
+        <div id="resultScreen" class="screen">
+            <div style="margin: auto 0; padding: 20px 0;">
+                <h1 id="resultTitle">听力小达人！🎉</h1>
+                <p class="desc" id="resultDesc">你成功征服了全部 100 关五年级英语听力特训！</p>
+                <div style="font-size: 3.8rem; font-weight: 800; color: #00f2fe; margin: 20px 0;" id="finalScore">0</div>
+                <button class="btn-main" onclick="restartFromZero()">重新开始 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const englishQuotes = [
+            { en: "Believe in yourself.", zh: "💡 相信你自己。" },
+            { en: "Every day is a new start.", zh: "💡 每一天都是一个新的开始。" },
+            { en: "Never give up.", zh: "💡 永不放弃。" },
+            { en: "Practice makes perfect.", zh: "💡 熟能生巧。" },
+            { en: "Where there is a will, there is a way.", zh: "💡 有志者，事竟成。" },
+            { en: "You can do it!", zh: "💡 你一定可以做到！" },
+            { en: "Keep trying and keep learning.", zh: "💡 保持尝试，不断学习。" },
+            { en: "Sunshine comes after the rain.", zh: "💡 风雨之后见彩虹。" },
+            { en: "Study hard and make progress every day.", zh: "💡 好好学习，天天向上。" },
+            { en: "Action speaks louder than words.", zh: "💡 行动胜于语言。" },
+            { en: "Knowledge is power.", zh: "💡 知识就是力量。" },
+            { en: "Failure is the mother of success.", zh: "💡 失败乃成功之母。" }
+        ];
+
+        const primaryChoicesDB = [
+            { 
+                text: "What is your favorite food, Amy? I like ice cream. It is sweet.", 
+                prompt: "听对话，选出正确答案：艾米最喜欢的食物是什么？", 
+                ans: "Ice cream.", 
+                choices: ["Ice cream.", "Apples.", "Sandwiches."] 
+            },
+            { 
+                text: "What do you have on Mondays? We have Chinese and English.", 
+                prompt: "听对话，选出正确答案：他们周一有什么课？", 
+                ans: "Chinese and English.", 
+                choices: ["Math and Music.", "Chinese and English.", "Art and PE."] 
+            },
+            { 
+                text: "What is Mr. Young like? He is very funny and friendly.", 
+                prompt: "听对话，选出正确答案：杨老师性格怎么样？", 
+                ans: "Funny and friendly.", 
+                choices: ["Strict.", "Funny and friendly.", "Quiet."] 
+            },
+            { 
+                text: "What can you do for the party, John? I can sing English songs.", 
+                prompt: "听对话，选出正确答案：约翰能在晚会上做什么？", 
+                ans: "Sing English songs.", 
+                choices: ["Sing English songs.", "Dance.", "Play basketball."] 
+            },
+            { 
+                text: "Is there a lake in the park? Yes, there is a big lake.", 
+                prompt: "听对话，选出正确答案：公园里有湖吗？", 
+                ans: "Yes, there is.", 
+                choices: ["Yes, there is.", "No, there isn't.", "We don't know."] 
+            },
+            { 
+                text: "What time is it now? It is seven o'clock. Time to get up!", 
+                prompt: "听对话，选出正确答案：现在是几点钟？", 
+                ans: "7:00.", 
+                choices: ["6:00.", "7:00.", "8:00."] 
+            },
+            { 
+                text: "What is the weather like today? It is sunny and warm.", 
+                prompt: "听对话，选出正确答案：今天天气怎么样？", 
+                ans: "Sunny and warm.", 
+                choices: ["Rainy and cold.", "Windy.", "Sunny and warm."] 
+            }
+        ];
+
+        const primaryClozeDB = [
+            {
+                audioText: "My English teacher is Miss White. She is very kind and helpful.",
+                prompt: "听录音完形填空，选出正确的单词：",
+                clozeText: "My English teacher is <span class='cloze-blank'>[ ? ]</span> White.",
+                ans: "Miss",
+                choices: ["Mr", "Miss", "Mrs"]
+            },
+            {
+                audioText: "I like weekend because I can play football with my friends in the park.",
+                prompt: "听短文完形填空，选出正确地点：",
+                clozeText: "I can play football with my friends in the <span class='cloze-blank'>[ ? ]</span>.",
+                ans: "park",
+                choices: ["park", "zoo", "school"]
+            },
+            {
+                audioText: "There are many trees and flowers in my village. It is very beautiful.",
+                prompt: "听短文完形填空，选出描述村庄特征的词：",
+                clozeText: "It is very <span class='cloze-blank'>[ ? ]</span>.",
+                ans: "beautiful",
+                choices: ["small", "beautiful", "dirty"]
+            },
+            {
+                audioText: "I often wash my clothes on Saturdays and clean my room on Sundays.",
+                prompt: "听短文完形填空，选出周日做的事情：",
+                clozeText: "I clean my <span class='cloze-blank'>[ ? ]</span> on Sundays.",
+                ans: "room",
+                choices: ["car", "room", "shoes"]
+            },
+            {
+                audioText: "What would you like to drink? I would like some water, please.",
+                prompt: "听对话完形填空，选出想喝的饮料：",
+                clozeText: "I would like some <span class='cloze-blank'>[ ? ]</span>, please.",
+                ans: "water",
+                choices: ["milk", "juice", "water"]
+            }
+        ];
+
+        function generate100Primary5Levels() {
+            let levels = [];
+            for (let i = 1; i <= 100; i++) {
+                let quoteObj = englishQuotes[(i - 1) % englishQuotes.length];
+                if (i % 2 === 1) {
+                    let base = primaryChoicesDB[(Math.floor(i / 2)) % primaryChoicesDB.length];
+                    levels.push({
+                        id: i,
+                        type: 'choice',
+                        title: `关卡 ${i}`,
+                        text: base.text,
+                        prompt: base.prompt,
+                        answer: base.ans,
+                        options: base.choices,
+                        hintText: `【听力原文】"${base.text}"`,
+                        quoteEn: `"${quoteObj.en}"`,
+                        quoteZh: quoteObj.zh
+                    });
+                } else {
+                    let base = primaryClozeDB[(Math.floor(i / 2 - 1)) % primaryClozeDB.length];
+                    levels.push({
+                        id: i,
+                        type: 'cloze',
+                        title: `关卡 ${i}`,
+                        text: base.audioText,
+                        prompt: base.prompt,
+                        clozeText: base.clozeText,
+                        answer: base.ans,
+                        options: base.choices,
+                        hintText: `【听力原文】"${base.audioText}"`,
+                        quoteEn: `"${quoteObj.en}"`,
+                        quoteZh: quoteObj.zh
+                    });
+                }
+            }
+            return levels;
+        }
+
+        const levels = generate100Primary5Levels();
+
+        let currentLevelIndex = 0;
+        let completedLevels = new Set();
+        let score = 0;
+        let hp = 3;
+        let currentSpeed = 0.75; 
+        let canAnswer = true;
+        let bestVoice = null;
+
+        const synth = window.speechSynthesis;
+
+        function initVoices() {
+            if (!synth) return;
+            const voices = synth.getVoices();
+            bestVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Jenny'))) 
+                     || voices.find(v => v.lang.startsWith('en-US')) 
+                     || voices.find(v => v.lang.startsWith('en'));
+        }
+
+        if (synth) {
+            initVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = initVoices;
+            }
+        }
+
+        function loadSavedProgress() {
+            const savedIdx = localStorage.getItem('listening_level_idx_p5_q');
+            const savedCompleted = localStorage.getItem('listening_completed_set_p5_q');
+            const savedScore = localStorage.getItem('listening_score_p5_q');
+            
+            if (savedIdx !== null) currentLevelIndex = parseInt(savedIdx, 10);
+            if (savedCompleted !== null) {
+                try {
+                    completedLevels = new Set(JSON.parse(savedCompleted));
+                } catch(e) {
+                    completedLevels = new Set();
+                }
+            }
+            if (savedScore !== null) score = parseInt(savedScore, 10);
+        }
+
+        function saveProgress() {
+            localStorage.setItem('listening_level_idx_p5_q', currentLevelIndex);
+            localStorage.setItem('listening_completed_set_p5_q', JSON.stringify(Array.from(completedLevels)));
+            localStorage.setItem('listening_score_p5_q', score);
+        }
+
+        function resetProgress() {
+            localStorage.removeItem('listening_level_idx_p5_q');
+            localStorage.removeItem('listening_completed_set_p5_q');
+            localStorage.removeItem('listening_score_p5_q');
+            currentLevelIndex = 0;
+            completedLevels.clear();
+            score = 0;
+            alert("闯关进度已重置！");
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startGame() {
+            loadSavedProgress();
+            hp = 3;
+            document.getElementById('headerStatus').style.display = 'flex';
+            updateHeader();
+            loadLevel();
+            showScreen('quizScreen');
+        }
+
+        function restartFromZero() {
+            currentLevelIndex = 0;
+            completedLevels.clear();
+            score = 0;
+            saveProgress();
+            startGame();
+        }
+
+        function updateHeader() {
+            document.getElementById('hpBar').innerText = '❤️'.repeat(hp) + '🖤'.repeat(3 - hp);
+            document.getElementById('scoreText').innerText = score;
+            document.getElementById('levelBadge').innerText = `关卡 ${currentLevelIndex + 1}/100 🗺️`;
+        }
+
+        function openMap() {
+            loadSavedProgress();
+            const grid = document.getElementById('levelGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < levels.length; i++) {
+                const node = document.createElement('div');
+                node.className = 'level-node';
+                
+                const isCompleted = completedLevels.has(i);
+                const isCurrent = i === currentLevelIndex;
+
+                if (isCurrent) node.classList.add('current');
+                else if (isCompleted) node.classList.add('completed');
+                
+                let tagIcon = levels[i].type === 'choice' ? '🔘' : '🧩';
+
+                const statusSymbol = isCompleted ? '✓' : '';
+                node.innerHTML = `<div>${i + 1}${statusSymbol}</div><div class="node-tag">${tagIcon}</div>`;
+                node.onclick = () => selectLevel(i);
+
+                grid.appendChild(node);
+            }
+
+            document.getElementById('mapModal').classList.add('active');
+        }
+
+        function closeMap() {
+            document.getElementById('mapModal').classList.remove('active');
+        }
+
+        function selectLevel(idx) {
+            currentLevelIndex = idx;
+            hp = 3; 
+            saveProgress();
+            closeMap();
+            document.getElementById('headerStatus').style.display = 'flex';
+            updateHeader();
+            loadLevel();
+            showScreen('quizScreen');
+        }
+
+        function prevLevel() {
+            if (currentLevelIndex > 0) {
+                if (synth.speaking) synth.cancel();
+                currentLevelIndex--;
+                saveProgress();
+                updateHeader();
+                loadLevel();
+            }
+        }
+
+        function nextLevel() {
+            if (currentLevelIndex < levels.length - 1) {
+                if (synth.speaking) synth.cancel();
+                currentLevelIndex++;
+                saveProgress();
+                updateHeader();
+                loadLevel();
+            }
+        }
+
+        function loadLevel() {
+            canAnswer = true;
+            document.getElementById('feedbackMsg').innerText = '';
+            
+            const hintBox = document.getElementById('hintBox');
+            hintBox.style.display = 'none';
+            hintBox.innerText = '';
+
+            document.getElementById('prevLevelBtn').disabled = (currentLevelIndex === 0);
+            document.getElementById('nextLevelBtn').disabled = (currentLevelIndex === levels.length - 1);
+
+            const q = levels[currentLevelIndex];
+
+            document.getElementById('quoteEn').innerText = q.quoteEn;
+            document.getElementById('quoteZh').innerText = q.quoteZh;
+            document.getElementById('questionPrompt').innerText = q.prompt;
+
+            const typeBadge = document.getElementById('typeBadge');
+            const choiceZone = document.getElementById('optionsGrid');
+            const clozeZone = document.getElementById('clozeZone');
+
+            if (q.type === 'choice') {
+                typeBadge.innerText = "五年级单选";
+                typeBadge.className = "type-badge type-choice";
+                choiceZone.style.display = 'flex';
+                clozeZone.style.display = 'none';
+
+                renderOptions(q.options, q.answer);
+            } else if (q.type === 'cloze') {
+                typeBadge.innerText = "完形填空";
+                typeBadge.className = "type-badge type-cloze";
+                choiceZone.style.display = 'flex';
+                clozeZone.style.display = 'block';
+
+                document.getElementById('clozeDisplay').innerHTML = q.clozeText;
+                renderOptions(q.options, q.answer);
+            }
+
+            setTimeout(() => playAudio(), 400);
+        }
+
+        function renderOptions(options, answer) {
+            const choiceZone = document.getElementById('optionsGrid');
+            choiceZone.innerHTML = '';
+            options.forEach(optText => {
+                const card = document.createElement('div');
+                card.className = 'option-card';
+                card.innerText = optText;
+                card.onclick = () => checkChoiceAnswer(card, optText === answer);
+                choiceZone.appendChild(card);
+            });
+        }
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hintBox');
+            const q = levels[currentLevelIndex];
+            if (hintBox.style.display === 'none' || hintBox.style.display === '') {
+                hintBox.innerText = q.hintText;
+                hintBox.style.display = 'block';
+            } else {
+                hintBox.style.display = 'none';
+            }
+        }
+
+        function setSpeed(speedVal, btnElem) {
+            currentSpeed = speedVal;
+            document.getElementById('currentSpeedText').innerText = speedVal + 'x';
+            document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+            btnElem.classList.add('active');
+            playAudio();
+        }
+
+        function playAudio() {
+            if (synth.speaking) synth.cancel();
+
+            const text = levels[currentLevelIndex].text;
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            utterance.lang = 'en-US';
+            utterance.rate = currentSpeed; 
+            utterance.pitch = 1.0;
+
+            if (bestVoice) {
+                utterance.voice = bestVoice;
+            }
+
+            const playBtn = document.getElementById('playBtn');
+            playBtn.classList.add('playing');
+
+            utterance.onend = () => playBtn.classList.remove('playing');
+            utterance.onerror = () => playBtn.classList.remove('playing');
+
+            synth.speak(utterance);
+        }
+
+        function checkChoiceAnswer(card, isCorrect) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            if (synth.speaking) synth.cancel();
+
+            if (isCorrect) {
+                card.classList.add('correct');
+                handleCorrect();
+            } else {
+                card.classList.add('wrong');
+                handleWrong(levels[currentLevelIndex].answer);
+            }
+        }
+
+        function handleCorrect() {
+            score += 100;
+            completedLevels.add(currentLevelIndex);
+            document.getElementById('feedbackMsg').style.color = '#2ed573';
+            document.getElementById('feedbackMsg').innerText = '✨ 回答正确！+100 分';
+
+            setTimeout(() => {
+                currentLevelIndex++;
+                saveProgress();
+                if (currentLevelIndex < levels.length) {
+                    updateHeader();
+                    loadLevel();
+                } else {
+                    endGame(true);
+                }
+            }, 1000);
+        }
+
+        function handleWrong(correctAnswer) {
+            hp--;
+            updateHeader();
+            document.getElementById('feedbackMsg').style.color = '#ff4757';
+            document.getElementById('feedbackMsg').innerText = `❌ 回答错误！正确答案：${correctAnswer}`;
+
+            setTimeout(() => {
+                if (hp > 0) {
+                    currentLevelIndex++;
+                    saveProgress();
+                    if (currentLevelIndex < levels.length) {
+                        loadLevel();
+                    } else {
+                        endGame(true);
+                    }
+                } else {
+                    endGame(false);
+                }
+            }, 1600);
+        }
+
+        function endGame(isWin) {
+            document.getElementById('headerStatus').style.display = 'none';
+            showScreen('resultScreen');
+            document.getElementById('finalScore').innerText = score + " 分";
+
+            if (isWin) {
+                document.getElementById('resultTitle').innerText = "🎉 听力小达人！";
+                document.getElementById('resultDesc').innerText = "恭喜你！成功通关全部 100 关五年级英语听力特训！";
+                triggerConfetti();
+            } else {
+                document.getElementById('resultTitle').innerText = "💔 闯关中断";
+                document.getElementById('resultDesc').innerText = "生命值已耗尽，点击下方或选关地图继续练习吧！";
+            }
+        }
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfetti() {
+            particles = [];
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.5) * 14 - 3,
+                    size: Math.random() * 6 + 3,
+                    color: `hsl(${Math.random() * 360}, 100%, 65%)`,
+                    alpha: 1
+                });
+            }
+            animateParticles();
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            particles.forEach(p => {
+                if (p.alpha > 0) {
+                    active = true;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2;
+                    p.alpha -= 0.015;
+                    ctx.globalAlpha = Math.max(0, p.alpha);
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            if (active) requestAnimationFrame(animateParticles);
+        }
+    </script>
+</body>
+</html>
